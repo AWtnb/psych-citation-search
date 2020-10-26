@@ -12,11 +12,14 @@ body {
     background: #c5e3cd;
 }
 
-.gh {
-    text-align: end;
-    padding-right: 2em;
+footer {
+    margin-top: 20px;
+    border-top: 4px solid #aaa;
 }
-.gh a {
+footer p {
+    margin-left: 1em;
+}
+footer a {
     text-decoration: none;
 }
 
