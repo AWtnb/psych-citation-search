@@ -12,6 +12,14 @@ body {
     background: #c5e3cd;
 }
 
+.gh {
+    text-align: end;
+    padding-right: 2em;
+}
+.gh a {
+    text-decoration: none;
+}
+
 table {
     margin: 4px 0 60px 10px;
     border-collapse: collapse;
