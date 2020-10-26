@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>図版情報検索</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <form id="search" style="display:none" onsubmit="return false;">
+        <input type="text" name="pattern" placeholder="search" >
+    </form>
+
+    <div id="status"></div>
+    <div id="content"></div>
+    <div id="found"></div>
+
+<script>
+
+// function to group object array by property "Isbn5"
+function groupBook(objArray){
+    const map = new Map();
+    objArray.forEach(data => {
+        const mapKey = `${data.Isbn5}『${data.BookTitle}』（${data.Series}）`;
+        if (map.has(mapKey)) {
+            map.get(mapKey).push(data);
+        }
+        else {
+            map.set(mapKey, [data]);
+        }
+    });
+    return map;
+}
+
+// function to markup as HTML
+function markupData(objArray){
+    const markup = [];
+    const grouped = groupBook(objArray);
+    grouped.forEach((val, key) => {
+        const tableRow = val.map(bk => {
+            return `<tr><td>${bk.FigureIndex}</td><td>${bk.FigureName}</td><td>${bk.Citation}</td><td>${bk.Keyword}</td><td>${bk.Note}</td></tr>`;
+        }).join("");
+        markup.push(
+            `<div class="container">
+                <h3>${key}</h3>
+                <table>
+                    <thead>
+                        <th>Index</th><th>Name</th><th>Citation</th><th>Keyword</th><th>Note</th>
+                    </thead>
+                    ${tableRow}
+                </table>
+            </div>`
+        );
+    });
+    return markup.join("\n");
+}
+
+// load table data via api
+document.addEventListener("DOMContentLoaded", () => {
+    const statusArea = document.querySelector("#status");
+    statusArea.innerHTML = "読込中";
+    const API_END_POINT = "https://script.google.com/macros/s/AKfycbyfqevi3YuUbR1CgUTBFBeYabcaY17Pk_6AZFgpKyg1gwvYG5s/exec";
+    const req = new XMLHttpRequest();
+    req.responseType = "json";
+    req.addEventListener("abort", () => {
+        statusArea.innerHTML = "読込失敗";
+    });
+    req.addEventListener("load", event => {
+        const res = event.target.response;
+        if(res.status != "ok") {
+            statusArea.innerHTML = "読込失敗";
+            return
+        }
+        statusArea.style.display = "none";
+        document.querySelector("#search").style.display = "inline";
+        document.querySelector("#content").innerHTML = markupData(res.data);
+    });
+    req.open("GET", API_END_POINT);
+    req.send();
+});
+
+let cache;
+function initCache () {
+    cache = document.querySelectorAll(".container");
+}
+
+// function to insert span tag
+function highlightTrElem (trElem, reg) {
+    return "<tr>" + Array.from(trElem.querySelectorAll("td"))
+        .map((td, i) => {
+            if (i == 0 || i == 4) {
+                return td.innerText;
+            }
+            return td.innerText.replace(reg, '<span class="marker">$1</span>');
+        })
+        .map(td => `<td>${td}</td>`)
+        .join("") + "</tr>";
+}
+
+// incremental search
+document.querySelector("#search input").addEventListener("keyup", search);
+function search(){
+    const pattern = document.querySelector("#search input").value;
+    const reg = new RegExp(`(${pattern})`, "gi");
+
+    if (pattern.length < 1) {
+        document.querySelector("#content").style.display = "block";
+        document.querySelector("#found").style.display = "none";
+        return
+    }
+
+    document.querySelector("#content").style.display = "none";
+    document.querySelector("#found").style.display = "block";
+
+    if (!cache) {
+        initCache();
+    }
+    const markup = [];
+    const length = cache.length;
+    for (let i = 0; i < length; i++) {
+        const tableRow = Array.from(cache[i].querySelectorAll("table tbody tr"));
+        const filtered = tableRow.filter(trElem => {
+            if (trElem.children[1].innerText.match(reg) || trElem.children[2].innerText.match(reg) || trElem.children[3].innerText.match(reg)) {
+                return true;
+            }
+            return false;
+        });
+        if (!filtered.length) {
+            continue;
+        }
+        markup.push(
+            `<div class="container">
+            <h3>${cache[i].firstElementChild.outerHTML}</h3>
+            <table>
+                <thead>
+                    <th>Index</th><th>Name</th><th>Citation</th><th>Keyword</th><th>Note</th>
+                </thead>
+                ${filtered.map(trElem => highlightTrElem(trElem, reg)).join("")}
+            </table>
+        </div>`
+        );
+    }
+    document.querySelector("#found").innerHTML = markup.join("\n");
+}
+
+</script>
+</body>
+</html>

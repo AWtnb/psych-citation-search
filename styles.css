@@ -1,0 +1,50 @@
+
+#search input {
+    margin: 1em;
+    padding: 4px;
+    width: 600px;
+    border-radius: 4px;
+    border: 1px solid steelblue;
+    font-size: 14pt;
+}
+
+body {
+    background: #c5e3cd;
+}
+
+table {
+    margin: 4px 0 60px 10px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: solid 1px #ccc;
+    text-align: start;
+}
+table th,td {
+    padding: .2rem .5rem;
+    line-height: 1;
+    border-right: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+}
+table td {
+    width: 20rem;
+    border-bottom: dotted 1px #aaa;
+}
+table td:nth-child(1) {
+    width: 80px;
+    color: #666;
+}
+table td:nth-child(5) {
+    color: #666;
+}
+table th {
+    background-color: #0e6f78;
+    color: #eee;
+    white-space: nowrap;
+}
+table tr:nth-child(even) {
+    background: #dce7e8;
+}
+
+.marker {
+    background: #fcba03;
+}
