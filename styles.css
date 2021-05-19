@@ -9,7 +9,7 @@
 }
 
 body {
-    background: #c5e3cd;
+    background: #eee;
 }
 
 footer {
@@ -27,18 +27,15 @@ table {
     margin: 4px 0 60px 10px;
     border-collapse: collapse;
     border-spacing: 0;
-    border: solid 1px #ccc;
+    border-bottom: 1px solid #0e6f78;
     text-align: start;
 }
 table th,td {
     padding: .2rem .5rem;
     line-height: 1;
-    border-right: 1px solid #aaa;
-    border-left: 1px solid #aaa;
 }
 table td {
     width: 20rem;
-    border-bottom: dotted 1px #aaa;
 }
 table td:nth-child(1) {
     width: 80px;
